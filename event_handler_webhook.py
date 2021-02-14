@@ -52,16 +52,19 @@ def topic_event_handler():
 
         topic = request.json['topic']
         tags = topic['tags']
-        id = topic['id']
+        topic_id = topic['id']
         title = topic['title']
         slug = topic['slug']
-        category_id = topic['category_id']
+        # I will edit the webhook to deliver only Deals category, so I don't have to look up
+        # the category by id.
+        # category_id = topic['category_id']
         created_by = topic['created_by']['username']
+        url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
 
         # msg = '%d %s %s' % (user_id, username, email)
-        msg = '%s created a new topic %s in category %d with tags %s. ' \
-              'If it does not have a deal status tag, please add it.' % \
-              (created_by, title, category_id, tags)
+        msg = '%s created a new Deal topic \"%s\" with tags %s. ' \
+              'If it does not have a deal status tag or other required tags, please add them at %s.' % \
+              (created_by, title, tags, url)
 
         send_simple_email('markschmucker@yahoo.com', event, msg)
 
