@@ -660,6 +660,20 @@ class DiscourseClient(object):
             **kwargs
         )
 
+    def flag(self, post_id, msg):
+        # masc added this. post_action_type=7 is to flag- could probably reverse-engineer
+        # how to delete etc also.
+
+        "https://forum.506investorgroup.com/post_actions?id=104522&post_action_type_id=7&message=Ignore+this+flag-+just+testing+what+happens+versions+2.&flag_topic=false"
+
+        return self._post(
+            "/post_actions",
+            id=post_id,
+            post_action_type_id=7,
+            flag_topic=False
+        )
+
+
     def update_topic_status(self, topic_id, status, enabled, **kwargs):
         """
         Open or close a topic
