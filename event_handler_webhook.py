@@ -77,7 +77,14 @@ def topic_event_handler():
         # but here I want to handle a topic event and I don't easily have the post id. It
         # might work though passing a post_id and setting flag_topic = True. If not, will
         # need to first get posts in topic id (there will only be one), then flag the post id.
-        client.flag(topic_id, msg)
+        # No that didn't work- need to get post_id.
+
+        # This might work- haven't committed, too tired. And now that I have the post id,
+        # flagging the topic might work and be a little better.
+        post = client.post(topic_id, 1)
+        post_id = post['post_stream']['posts'][0]['id']
+        print "flagging post id %d" % post_id
+        client.flag(post_id, msg)
 
         return '', 200
     else:
