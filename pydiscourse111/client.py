@@ -670,9 +670,9 @@ class DiscourseClient(object):
             "/post_actions",
             id=post_id,
             post_action_type_id=7,
+            message=msg,
             flag_topic=False
         )
-
 
     def update_topic_status(self, topic_id, status, enabled, **kwargs):
         """
