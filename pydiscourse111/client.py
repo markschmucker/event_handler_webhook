@@ -670,7 +670,7 @@ class DiscourseClient(object):
             "/post_actions",
             id=post_id,
             post_action_type_id=7,
-            flag_topic=False
+            flag_topic=True
         )
 
 
