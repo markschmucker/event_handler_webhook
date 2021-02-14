@@ -69,4 +69,4 @@ def topic_event_handler():
 if __name__ == "__main__":
     # Digests use 8081, forms use 8082, tracking_pixel and resourse server use 8083,
     # not sure if either of those two on 8083 are running; run this on 8084 (it's open).
-    app.run(host="0.0.0.0", port=8084, debug=True, threaded=True)
+    app.run(host="0.0.0.0", port=8085, debug=True, threaded=True)
