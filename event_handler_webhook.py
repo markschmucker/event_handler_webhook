@@ -14,12 +14,12 @@ from pydiscourse.exceptions import (
 
 recipients = ['markschmucker@yahoo.com',]
 
-logger = logging.getLogger('quiz_webhook')
-file_handler = logging.FileHandler('quiz_webhook.log')
+logger = logging.getLogger('event_webhook')
+file_handler = logging.FileHandler('event_webhook.log')
 file_handler.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 
-logger.info('running quiz web hook server.py')
+logger.info('running event web hook server.py')
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -43,20 +43,27 @@ def topic_event_handler():
     headers = request.headers
     pprint(headers)
 
+
+    event_type = request.headers['X-Discourse-Event-Type']
     event = request.headers['X-Discourse-Event']
     print 'event: ', event
 
-    #if event == 'user_created':
-    if True:
+    if event_type == 'topic' and event == 'topic_created':
 
-        # user = request.json['user']
-        #
-        # user_id = user['id']
-        # email = user['email']
-        # username = user['username']
+        topic = request.json['topic']
+        tags = topic['tags']
+        id = topic['id']
+        title = topic['title']
+        slug = topic['slug']
+        category_id = topic['category_id']
+        created_by = topic['created_by']['username']
+
         # msg = '%d %s %s' % (user_id, username, email)
+        msg = '%s created a new topic %s in category %d with tags %s. ' \
+              'If it does not have a deal status tag, please add it.' % \
+              (created_by, title, category_id, tags)
 
-        send_simple_email('markschmucker@yahoo.com', event, request.json)
+        send_simple_email('markschmucker@yahoo.com', event, msg)
 
         client = create_client(1)
         # send notification here
