@@ -69,21 +69,10 @@ def topic_event_handler():
         send_simple_email('markschmucker@yahoo.com', event, msg)
 
         client = create_client(1)
-        # how to create notification or post? pydiscourse has create_post where you can
-        # give it a category id or topic id. So maybe create a topic Tags to Check in
-        # category staff and create a new post there each time.
-        # Or the review queue would be the right way.
-        # I added flag() to client.py, but the way I reversed-engineered it wants a post_id,
-        # but here I want to handle a topic event and I don't easily have the post id. It
-        # might work though passing a post_id and setting flag_topic = True. If not, will
-        # need to first get posts in topic id (there will only be one), then flag the post id.
-        # No that didn't work- need to get post_id.
-
-        # This might work- haven't committed, too tired. And now that I have the post id,
-        # flagging the topic might work and be a little better.
         post = client.post(topic_id, 1)
         post_id = post['post_stream']['posts'][0]['id']
         print "flagging post id %d" % post_id
+        # Note the flag method is currently added to client.py, not a subclass client506.py.
         client.flag(post_id, msg)
 
         return '', 200

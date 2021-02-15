@@ -661,8 +661,7 @@ class DiscourseClient(object):
         )
 
     def flag(self, post_id, msg):
-        # masc added this. post_action_type=7 is to flag- could probably reverse-engineer
-        # how to delete etc also.
+        # masc added this. post_action_type=7 is to flag. Could also use 6 to notify user.
 
         "https://forum.506investorgroup.com/post_actions?id=104522&post_action_type_id=7&message=Ignore+this+flag-+just+testing+what+happens+versions+2.&flag_topic=false"
 
@@ -671,7 +670,7 @@ class DiscourseClient(object):
             id=post_id,
             post_action_type_id=7,
             message=msg,
-            flag_topic=False
+            flag_topic=True
         )
 
     def update_topic_status(self, topic_id, status, enabled, **kwargs):
