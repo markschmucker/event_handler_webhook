@@ -269,7 +269,7 @@ def get_api_key():
 def create_client(max_attempts=10):
     client = MyDiscourseClient(
         'https://forum.506investorgroup.com/',
-        api_username='admin',
+        api_username='discobot',
         api_key=get_api_key(),
         timeout=5)
     client.max_attempts = max_attempts
