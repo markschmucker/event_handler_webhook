@@ -62,9 +62,9 @@ def topic_event_handler():
         created_by = topic['created_by']['username']
         url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
 
-        msg = '**[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317/2)**\n' \
-              '@%s created a new topic: \"%s\".\n' \
-              'Review here: %s.\n' % \
+        msg = '**[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317)**  \s\s' \
+              '@%s created a new topic: \"%s\".  \s\s' \
+              'Review here: %s.  \s\s' % \
               (created_by, title, url)
 
         send_simple_email('markschmucker@yahoo.com', event, msg)
@@ -72,7 +72,7 @@ def topic_event_handler():
         client = create_client(1)
         post = client.post(topic_id, 1)
         post_id = post['post_stream']['posts'][0]['id']
-        
+
         # Note the flag method is currently added to client.py, not a subclass client506.py.
         client.flag(post_id, msg)
 
