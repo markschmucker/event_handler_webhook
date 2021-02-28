@@ -52,7 +52,7 @@ def topic_event_handler():
     if event_type == 'topic' and event == 'topic_created':
 
         topic = request.json['topic']
-        tags = topic['tags']
+        # tags = topic['tags'] sometimes have no tags
         topic_id = topic['id']
         title = topic['title']
         slug = topic['slug']
@@ -62,9 +62,9 @@ def topic_event_handler():
         created_by = topic['created_by']['username']
         url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
 
-        msg = '**[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317)**  \s\s' \
-              '@%s created a new topic: \"%s\".  \s\s' \
-              'Review here: %s.  \s\s' % \
+        msg = '**[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317)**  ' \
+              '@%s created a new topic: \"%s\".  ' \
+              'Review here: %s.  ' % \
               (created_by, title, url)
 
         send_simple_email('markschmucker@yahoo.com', event, msg)
