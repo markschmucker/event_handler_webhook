@@ -63,7 +63,11 @@ def topic_event_handler():
         url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
 
         msg = '**[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317)**  ' \
+              ' ' \
+              '' \
               '@%s created a new topic: \"%s\".  ' \
+              ' ' \
+              '' \
               'Review here: %s.  ' % \
               (created_by, title, url)
 
