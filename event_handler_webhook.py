@@ -40,10 +40,6 @@ def topic_event_handler():
     # for users, topics, and posts. (However not for user_added_to_group). See
     # https://meta.discourse.org/t/setting-up-webhooks/49045. See webhook page.
 
-    headers = request.headers
-    pprint(headers)
-
-
     event_type = request.headers['X-Discourse-Event-Type']
     event = request.headers['X-Discourse-Event']
     print 'event: ', event
@@ -52,29 +48,35 @@ def topic_event_handler():
     if event_type == 'topic' and event == 'topic_created':
 
         topic = request.json['topic']
-        # tags = topic['tags'] sometimes have no tags
-        topic_id = topic['id']
-        title = topic['title']
-        slug = topic['slug']
-        # I will edit the webhook to deliver only Deals category, so I don't have to look up
-        # the category by id.
-        # category_id = topic['category_id']
+
+        # Checks to make sure it's a normal public topic, not a PM or system message
         created_by = topic['created_by']['username']
-        url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
+        archetype = topic['archetype']
+        user_id = topic['user_id']
 
-        msg = '- **[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317)**  ' \
-              '- @%s created a new topic: \"%s\".  ' \
-              '- Review here: %s.  ' % \
-              (created_by, title, url)
+        # Just the first check should be sufficient. User ID > 0 excludes system and discobot.
+        if str(archetype) == 'regular' and user_id > 0:
+            tags = topic.get('tags', [])
+            topic_id = topic['id']
+            title = topic['title']
+            slug = topic['slug']
+            # Could edit the webhook to deliver only Deals category
+            # category_id = topic['category_id']
+            url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
 
-        send_simple_email('markschmucker@yahoo.com', event, msg)
+            msg = '**[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317)**  ' \
+                  '@%s created a new topic: \"%s\".  ' \
+                  'Review here: %s.  ' % \
+                  (created_by, title, url)
 
-        client = create_client(1)
-        post = client.post(topic_id, 1)
-        post_id = post['post_stream']['posts'][0]['id']
+            send_simple_email('markschmucker@yahoo.com', event, msg)
 
-        # Note the flag method is currently added to client.py, not a subclass client506.py.
-        client.flag(post_id, msg)
+            client = create_client(1)
+            post = client.post(topic_id, 1)
+            post_id = post['post_stream']['posts'][0]['id']
+
+            # Note the flag method is currently added to client.py, not a subclass client506.py.
+            client.flag(post_id, msg)
 
         return '', 200
     else:
