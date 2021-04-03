@@ -192,6 +192,8 @@ def post_event_handler():
                 post = client.post(topic_id, 1)
                 post_id = post['post_stream']['posts'][0]['id']
 
+                print 'post_id', post_id
+
                 # Note the flag method is currently added to client.py, not a subclass client506.py.
                 client.flag(post_id, msg)
 
