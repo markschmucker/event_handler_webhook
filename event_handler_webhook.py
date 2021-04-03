@@ -191,7 +191,7 @@ def post_event_handler():
                 send_simple_email('markschmucker@yahoo.com', event, msg)
 
                 client = create_client(1)
-                post = client.post(topic_id, 1)
+                # post = client.post(topic_id, 1)
                 # post_id = post['post_stream']['posts'][0]['id']
                 post_id = post['id']
 
