@@ -166,10 +166,11 @@ def post_event_handler():
 
         # Checks to make sure it's a normal public topic, not a PM or system message
         archetype = post.get('topic_archetype')
+        user_id = post['user_id']
 
         print 'archetype: ', archetype
 
-        if archetype != 'private_message':
+        if archetype != 'private_message' and user_id > 0:
             raw = post['raw']
 
             print 'raw: ', raw
@@ -195,6 +196,8 @@ def post_event_handler():
                 post_id = post['id']
 
                 print 'post_id', post_id
+
+                # all working except not getting the right post_id.
 
                 # Note the flag method is currently added to client.py, not a subclass client506.py.
                 client.flag(post_id, msg)
