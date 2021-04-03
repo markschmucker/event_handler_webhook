@@ -124,7 +124,7 @@ def post_event_handler():
             #       'Review here: %s.  ' % \
             #       (created_by, title, url)
 
-            msg = "Ïnterpret this"
+            msg = 'Interpret this'
 
             send_simple_email('markschmucker@yahoo.com', event, msg)
 
