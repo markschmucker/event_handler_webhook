@@ -85,6 +85,57 @@ def topic_event_handler():
         return '', 400
 
 
+
+"""
+{
+  "post": {
+    "id": 117267,
+    "name": "Mark Schmucker",
+    "username": "admin",
+    "avatar_template": "/user_avatar/forum.506investorgroup.com/admin/{size}/52_2.png",
+    "created_at": "2021-04-03T01:17:39.698Z",
+    "cooked": "<p>test pm to john doe.</p>",
+    "post_number": 1,
+    "post_type": 1,
+    "updated_at": "2021-04-03T01:17:39.698Z",
+    "reply_count": 0,
+    "reply_to_post_number": null,
+    "quote_count": 0,
+    "incoming_link_count": 0,
+    "reads": 0,
+    "score": 0,
+    "topic_id": 25303,
+    "topic_slug": "re-test-flagging-certain-words",
+    "topic_title": "RE: Test flagging certain words",
+    "category_id": null,
+    "display_username": "Mark Schmucker",
+    "primary_group_name": null,
+    "version": 1,
+    "user_title": "506 Staff",
+    "title_is_group": false,
+    "bookmarked": false,
+    "raw": "test pm to john doe.",
+    "moderator": false,
+    "admin": true,
+    "staff": true,
+    "user_id": 1,
+    "hidden": false,
+    "trust_level": 3,
+    "deleted_at": null,
+    "user_deleted": false,
+    "edit_reason": null,
+    "wiki": false,
+    "reviewable_id": null,
+    "reviewable_score_count": 0,
+    "reviewable_score_pending_count": 0,
+    "topic_posts_count": 1,
+    "topic_filtered_posts_count": 1,
+    "topic_archetype": "private_message"
+  }
+}
+"""
+
+
 @app.route('/post_event', methods=['POST'])
 def post_event_handler():
 
@@ -104,36 +155,25 @@ def post_event_handler():
 
         # Checks to make sure it's a normal public topic, not a PM or system message
         created_by = post['username']
-        post_type = post['post_type']  # 1 is "regular". Does that exclude PMs? Need to test.
+        archetype = post.get('topic_archetype')
+        pm = archetype == 'private_message'
 
-        if post_type == 1:
-            cooked = post['cooked']
+        if archetype != 'private_message':
+            raw = post['raw']
+            slug = post['topic_slug']
+            topic_id = post['topic_id']
+            url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
 
-
-
-            # tags = topic.get('tags', [])
-            # topic_id = topic['id']
-            # title = topic['title']
-            # slug = topic['slug']
-            # # Could edit the webhook to deliver only Deals category
-            # # category_id = topic['category_id']
-            # url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
-            #
-            # msg = '**[How to Review a New Topic](https://forum.506investorgroup.com/t/moderators-reviewing-each-new-topic/18317)**  ' \
-            #       '@%s created a new topic: \"%s\".  ' \
-            #       'Review here: %s.  ' % \
-            #       (created_by, title, url)
-
-            msg = 'Interpret this'
+            msg = 'New post may contain wiring instructions. Add staff notice if needed. Review here: %s.  ' % url
 
             send_simple_email('markschmucker@yahoo.com', event, msg)
 
-            # client = create_client(1)
-            # post = client.post(topic_id, 1)
-            # post_id = post['post_stream']['posts'][0]['id']
-            #
-            # # Note the flag method is currently added to client.py, not a subclass client506.py.
-            # client.flag(post_id, msg)
+            client = create_client(1)
+            post = client.post(topic_id, 1)
+            post_id = post['post_stream']['posts'][0]['id']
+
+            # Note the flag method is currently added to client.py, not a subclass client506.py.
+            client.flag(post_id, msg)
 
         return '', 200
     else:
