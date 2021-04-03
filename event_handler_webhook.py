@@ -180,7 +180,8 @@ def post_event_handler():
 
                 slug = post['topic_slug']
                 topic_id = post['topic_id']
-                url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
+                post_number = post['post_number']
+                url = "https://forum.506investorgroup.com/t/%s/%d/%d" % (slug, topic_id, post_number)
 
                 msg = 'New post may contain wiring instructions. Add staff notice if needed. Review here: %s.  ' % url
 
@@ -190,7 +191,8 @@ def post_event_handler():
 
                 client = create_client(1)
                 post = client.post(topic_id, 1)
-                post_id = post['post_stream']['posts'][0]['id']
+                # post_id = post['post_stream']['posts'][0]['id']
+                post_id = post['id']
 
                 print 'post_id', post_id
 
