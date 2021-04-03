@@ -136,6 +136,13 @@ def topic_event_handler():
 """
 
 
+def contains_wiring_info(s):
+    # todo: regex to not flag abandon etc
+    s = s.lower()
+    if 'wire' in s or 'wiring' in s or 'aba' in s or 'routing' in s:
+        return True
+
+
 @app.route('/post_event', methods=['POST'])
 def post_event_handler():
 
@@ -147,33 +154,46 @@ def post_event_handler():
     event_type = request.headers['X-Discourse-Event-Type']
     event = request.headers['X-Discourse-Event']
     print 'event: ', event
+    print 'event_type', event_type
 
     # Any checks for category are best done in the webhook settings
     if event_type == 'post' and event == 'post_created':
 
         post = request.json['post']
 
+        print 'post: '
+        print post
+
         # Checks to make sure it's a normal public topic, not a PM or system message
-        created_by = post['username']
         archetype = post.get('topic_archetype')
-        pm = archetype == 'private_message'
+
+        print 'archetype: ', archetype
 
         if archetype != 'private_message':
             raw = post['raw']
-            slug = post['topic_slug']
-            topic_id = post['topic_id']
-            url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
 
-            msg = 'New post may contain wiring instructions. Add staff notice if needed. Review here: %s.  ' % url
+            print 'raw: ', raw
 
-            send_simple_email('markschmucker@yahoo.com', event, msg)
+            if contains_wiring_info(raw):
 
-            client = create_client(1)
-            post = client.post(topic_id, 1)
-            post_id = post['post_stream']['posts'][0]['id']
+                print 'contains something about wires'
 
-            # Note the flag method is currently added to client.py, not a subclass client506.py.
-            client.flag(post_id, msg)
+                slug = post['topic_slug']
+                topic_id = post['topic_id']
+                url = "https://forum.506investorgroup.com/t/%s/%d" % (slug, topic_id)
+
+                msg = 'New post may contain wiring instructions. Add staff notice if needed. Review here: %s.  ' % url
+
+                print 'msg: ', msg
+
+                send_simple_email('markschmucker@yahoo.com', event, msg)
+
+                client = create_client(1)
+                post = client.post(topic_id, 1)
+                post_id = post['post_stream']['posts'][0]['id']
+
+                # Note the flag method is currently added to client.py, not a subclass client506.py.
+                client.flag(post_id, msg)
 
         return '', 200
     else:
