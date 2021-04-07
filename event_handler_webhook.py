@@ -173,9 +173,9 @@ def post_event_handler():
 
         if archetype != 'private_message' and user_id > 0:
             raw = post['raw']
-            raw = str(raw)  # trying to handle unicode issue
-
-            print 'raw: ', raw
+            
+            #raw = str(raw)  # trying to handle unicode issue
+            #print 'raw: ', raw
 
             if contains_wiring_info(raw):
 
