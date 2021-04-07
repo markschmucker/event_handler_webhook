@@ -4,13 +4,9 @@ A flask server to handle webhooks from Discourse.
 
 from flask import Flask, render_template, flash, request
 import logging
-import json
-from pprint import pprint, pformat
 from client506 import create_client
 from ses import send_simple_email
-from pydiscourse.exceptions import (
-    DiscourseClientError
-)
+import re
 
 recipients = ['markschmucker@yahoo.com',]
 
@@ -137,10 +133,15 @@ def topic_event_handler():
 
 
 def contains_wiring_info(s):
-    # todo: regex to not flag abandon etc
+    """ Return True if s contains a wire-word and exactly 9 consecutive digits
+    """
     s = s.lower()
+    s += ' '  # sidestep any ending issues
     if 'wire' in s or 'wiring' in s or 'aba' in s or 'routing' in s:
-        return True
+        r = r'[^\d]\d{9}[^\d]'
+        x = re.findall(r, s)
+        return bool(x)
+    return False
 
 
 @app.route('/post_event', methods=['POST'])
