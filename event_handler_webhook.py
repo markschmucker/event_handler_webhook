@@ -81,57 +81,6 @@ def topic_event_handler():
         return '', 400
 
 
-
-"""
-{
-  "post": {
-    "id": 117267,
-    "name": "Mark Schmucker",
-    "username": "admin",
-    "avatar_template": "/user_avatar/forum.506investorgroup.com/admin/{size}/52_2.png",
-    "created_at": "2021-04-03T01:17:39.698Z",
-    "cooked": "<p>test pm to john doe.</p>",
-    "post_number": 1,
-    "post_type": 1,
-    "updated_at": "2021-04-03T01:17:39.698Z",
-    "reply_count": 0,
-    "reply_to_post_number": null,
-    "quote_count": 0,
-    "incoming_link_count": 0,
-    "reads": 0,
-    "score": 0,
-    "topic_id": 25303,
-    "topic_slug": "re-test-flagging-certain-words",
-    "topic_title": "RE: Test flagging certain words",
-    "category_id": null,
-    "display_username": "Mark Schmucker",
-    "primary_group_name": null,
-    "version": 1,
-    "user_title": "506 Staff",
-    "title_is_group": false,
-    "bookmarked": false,
-    "raw": "test pm to john doe.",
-    "moderator": false,
-    "admin": true,
-    "staff": true,
-    "user_id": 1,
-    "hidden": false,
-    "trust_level": 3,
-    "deleted_at": null,
-    "user_deleted": false,
-    "edit_reason": null,
-    "wiki": false,
-    "reviewable_id": null,
-    "reviewable_score_count": 0,
-    "reviewable_score_pending_count": 0,
-    "topic_posts_count": 1,
-    "topic_filtered_posts_count": 1,
-    "topic_archetype": "private_message"
-  }
-}
-"""
-
-
 def contains_wiring_info(s):
     """ Return True if s contains a wire-word and exactly 9 consecutive digits
     """
@@ -173,7 +122,7 @@ def post_event_handler():
 
         if archetype != 'private_message' and user_id > 0:
             raw = post['raw']
-            
+
             #raw = str(raw)  # trying to handle unicode issue
             #print 'raw: ', raw
 
@@ -207,6 +156,67 @@ def post_event_handler():
         return '', 200
     else:
         return '', 400
+
+
+@app.route('/user_event', methods=['POST'])
+def user_event_handler():
+
+    # This handler handles user events, so mods can check for full name on user_created
+    # and hopefully on user_updated.
+
+    # Ideally I could put arbitrary reviewables on the queue, but that's not possible.
+    # Creating a reviewable of type "User" applies only to new users- mods can approve
+    # the user or not- so that's not appropriate for this. The best I can do is when a
+    # user changes his name or username, I can flag the New Members topic at
+    # https://forum.506investorgroup.com/t/policy-actual-full-name-must-be-used-on-the-forum/7298,
+    # and in the message include the user's new name and username.
+
+    # The check for new users could be done in either of two ways:
+    # 1. This webhook, with type = user_created.
+    # 2. The built-in option must_approve_users.
+    # I'm trying the second option because it's no work, and blocks the new user until
+    # they are approved. However I may still need a webhook here in case the user changes
+    # their name or username.
+
+    # Wait until we've approved a few new users via the built-in method before implementing this?
+
+    event_type = request.headers['X-Discourse-Event-Type']
+    event = request.headers['X-Discourse-Event']
+    print 'event: ', event
+    print 'event_type', event_type
+
+    # Any checks for category are best done in the webhook settings
+    if event_type == 'user' and event in ('user_created', 'user_updated'):
+
+        user = request.json['user']
+
+        print 'user created: '
+        print user
+
+        # just guessing
+        name = user['name']
+        username = user['username']
+
+        url = "https://forum.506investorgroup.com/u/%s/summary" % username
+
+        msg = 'User created or updated. username: %s, name: %s. Review here: %s.  ' % (username, name, url)
+
+        print 'msg: ', msg
+
+        send_simple_email('markschmucker@yahoo.com', event, msg)
+
+        client = create_client(1)
+
+        # Must flag some post, so flag the full-name policy post (data-post-id from inspection)
+        post_id = 50958
+
+        # Note the flag method is currently added to client.py, not a subclass client506.py.
+        client.flag(post_id, msg)
+
+        return '', 200
+    else:
+        return '', 400
+
 
 
 if __name__ == "__main__":
