@@ -86,6 +86,12 @@ def contains_wiring_info(s):
     """
     s = s.lower()
     s += ' '  # sidestep any ending issues
+    
+    # prevent false positives on known words and terms
+    whitelist = ['newswire', 'under the wire']
+    for w in whitelist:
+        s = s.replace(w, '')
+    
     if 'wire' in s or 'wiring' in s or 'aba' in s or 'routing' in s:
         r = r'[^\d]\d{9}[^\d]'
         x = re.findall(r, s)
