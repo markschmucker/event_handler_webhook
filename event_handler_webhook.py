@@ -67,8 +67,6 @@ def topic_event_handler():
                   'Review here: %s.  ' % \
                   (created_by, title, url)
 
-            send_simple_email('markschmucker@yahoo.com', event, msg)
-
             client = create_client(1)
             post = client.post(topic_id, 1)
             post_id = post['post_stream']['posts'][0]['id']
@@ -76,6 +74,9 @@ def topic_event_handler():
             # Note the flag method is currently added to client.py, not a subclass client506.py.
             client.flag(post_id, msg)
 
+            send_simple_email('markschmucker@yahoo.com', event, msg)
+            send_simple_email('markschmucker@yahoo.com', event, str(topic)  # full raw message
+            
         return '', 200
     else:
         return '', 400
