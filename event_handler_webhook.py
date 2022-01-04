@@ -75,7 +75,7 @@ def topic_event_handler():
             client.flag(post_id, msg)
 
             send_simple_email('markschmucker@yahoo.com', event, msg)
-            send_simple_email('markschmucker@yahoo.com', event, str(topic)  # full raw message
+            send_simple_email('markschmucker@yahoo.com', event, str(topic))  # full raw message
             
         return '', 200
     else:
