@@ -46,6 +46,11 @@ def topic_event_handler():
     if event_type == 'topic' and event == 'topic_created':
 
         topic = request.json['topic']
+        
+        # See https://meta.discourse.org/t/topic-event-webhook-broken-false-topic-created-messages/213884
+        if topic['posts_count'] > 1:
+            send_simple_email('markschmucker@yahoo.com', 'false new topic, not processing', str(topic))  # full raw message
+            return '', 400
 
         # Checks to make sure it's a normal public topic, not a PM or system message
         created_by = topic['created_by']['username']
