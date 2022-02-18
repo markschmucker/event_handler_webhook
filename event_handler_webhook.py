@@ -190,28 +190,31 @@ def user_event_handler():
     # they are approved. However I may still need a webhook here in case the user changes
     # their name or username.
 
-    # Wait until we've approved a few new users via the built-in method before implementing this?
-
     event_type = request.headers['X-Discourse-Event-Type']
     event = request.headers['X-Discourse-Event']
     print 'event: ', event
     print 'event_type', event_type
 
     # Any checks for category are best done in the webhook settings
-    if event_type == 'user' and event in ('user_created', 'user_updated'):
+    if event_type == 'user' and event == 'user_created':
 
         user = request.json['user']
 
         print 'user created: '
         print user
 
-        # just guessing
         name = user['name']
         username = user['username']
 
+        num_lc = len([c for c in username if c.islower()])
+        num_uc = len([c for c in username if c.isupper()])
+        num_digits = len([c for c in username if c.isdigit()])
+        
+        flag = num_digits > 0 or num_uc == 0 or num_uc > 2
+        
         url = "https://forum.506investorgroup.com/u/%s/summary" % username
 
-        msg = 'User created or updated. username: %s, name: %s. Review here: %s.  ' % (username, name, url)
+        msg = 'User created or updated. Flagging = %s. username: %s, name: %s. Review here: %s.  ' % (flag, username, name, url)
 
         print 'msg: ', msg
 
@@ -223,7 +226,8 @@ def user_event_handler():
         post_id = 50958
 
         # Note the flag method is currently added to client.py, not a subclass client506.py.
-        client.flag(post_id, msg)
+        if flag:
+            client.flag(post_id, msg)
 
         return '', 200
     else:
