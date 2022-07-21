@@ -107,6 +107,11 @@ def contains_wiring_info(s):
 
 @app.route('/post_event', methods=['POST'])
 def post_event_handler():
+    
+    # The webhook for post events is currently disabled. This code works if the webhook is
+    # enabled. Mods found the wiring info check more trouble than it was worth. So if this
+    # code is modified to handle another type of post event and the webhook is enabled,
+    # remove the check for wire info.
 
     # This handler handles new posts. If the post appears to contain wiring instructions,
     # flag the new topic for moderator review. Mods will add a staff notice warning about
