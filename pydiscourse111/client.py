@@ -663,6 +663,9 @@ class DiscourseClient(object):
     def flag(self, post_id, msg):
         # masc added this. post_action_type=7 is to flag. Could also use 6 to notify user.
 
+        # Jan 2024 this is broken with error "no permission to view resource". Reverse-engineering,
+        # I see when I flag a topic manually, flag_topic is now false. So maybe need to change that.
+
         "https://forum.506investorgroup.com/post_actions?id=104522&post_action_type_id=7&message=Ignore+this+flag-+just+testing+what+happens+versions+2.&flag_topic=false"
 
         return self._post(
